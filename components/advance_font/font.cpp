@@ -71,8 +71,6 @@ void Font::measure(const char *text, int *width, int *x_offset, int *baseline, i
     *x_offset = 0;
     measure_internal(font, glyph_count, glyph_info, glyph_pos, width, baseline, height);
 
-    ESP_LOGW("Font::measure", "width: %d, x_offset: %d, baseline: %d, height: %d", *width, *x_offset, *baseline, *height);
-
     hb_buffer_destroy(buf);
     hb_font_destroy(font);
     hb_face_destroy(face);
