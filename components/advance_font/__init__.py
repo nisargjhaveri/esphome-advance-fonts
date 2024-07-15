@@ -17,9 +17,9 @@ DOMAIN = "font"
 DEPENDENCIES = ["display"]
 MULTI_CONF = True
 
-harfbuzz_ns = cg.esphome_ns.namespace("advance_font")
+advance_font_ns = cg.esphome_ns.namespace("advance_font")
 
-Font = harfbuzz_ns.class_("Font")
+Font = advance_font_ns.class_("Font")
 
 CONFIG_SCHEMA = cv.All({
     cv.Required(CONF_ID): cv.declare_id(Font),
@@ -29,14 +29,8 @@ CONFIG_SCHEMA = cv.All({
 });
 
 async def to_code(config):
-    # Copy supporting files for harfbuzz build
-    copy_files()
-
-    # Add harfbuzz as a library and setup build flags
-    cg.add_library("harfbuzz", None, "https://github.com/harfbuzz/harfbuzz.git#9.0.0")
-    cg.add_build_flag("-DHB_TINY")
-    cg.add_build_flag("-DHB_CONFIG_OVERRIDE_H=\"\\\"$PROJECT_DIR/harfbuzz/config-override.h\\\"\"")
-    cg.add_platformio_option("extra_scripts", ["pre:harfbuzz_build.py"])
+    # Setup harfbuzz build
+    setup_harfbuzz_build()
 
     # Read the font file and create a static array
     filename = CORE.relative_config_path(config[CONF_FILE])
@@ -54,7 +48,7 @@ async def to_code(config):
         config[CONF_SIZE],
     )
 
-def copy_files() -> bool:
+def copy_harfbuzz_files() -> bool:
     dir = os.path.dirname(__file__)
 
     copy_file_if_changed(
@@ -66,3 +60,13 @@ def copy_files() -> bool:
         os.path.join(dir, "harfbuzz", "config-override.h"),
         CORE.relative_build_path("harfbuzz/config-override.h"),
     )
+
+def setup_harfbuzz_build():
+    # Copy supporting files for harfbuzz build
+    copy_harfbuzz_files()
+
+    # Add harfbuzz as a library and setup build flags
+    cg.add_library("harfbuzz", None, "https://github.com/harfbuzz/harfbuzz.git#9.0.0")
+    cg.add_build_flag("-DHB_TINY")
+    cg.add_build_flag("-DHB_CONFIG_OVERRIDE_H=\"\\\"$PROJECT_DIR/harfbuzz/config-override.h\\\"\"")
+    cg.add_platformio_option("extra_scripts", ["pre:harfbuzz_build.py"])
