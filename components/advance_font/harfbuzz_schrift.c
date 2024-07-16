@@ -96,7 +96,7 @@ int draw_glyph(hb_font_t* font, hb_codepoint_t glyph, hb_glyph_extents_t extents
         .height = -1 * extents.height,
         .width = extents.width
     };
-    double transform[6] = {1, 0, 0, -1, -extents.x_bearing, extents.y_bearing};
+    float transform[6] = {1, 0, 0, -1, -extents.x_bearing, extents.y_bearing};
     render_outline(&outline, transform, image);
 
     free_outline(&outline);

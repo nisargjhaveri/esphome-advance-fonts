@@ -27,7 +27,7 @@
 typedef struct Cell    Cell;
 typedef struct Raster  Raster;
 
-struct Cell  { double area, cover; };
+struct Cell  { float area, cover; };
 
 struct Raster
 {
@@ -37,11 +37,11 @@ struct Raster
 };
 
 /* function declarations */
-static inline int fast_floor(double x);
-static inline int fast_ceil (double x);
+static inline int fast_floor(float x);
+static inline int fast_ceil (float x);
 /* simple mathematical operations */
 static Point midpoint(Point a, Point b);
-static void transform_points(unsigned int numPts, Point *points, double trf[6]);
+static void transform_points(unsigned int numPts, Point *points, float trf[6]);
 static void clip_points(unsigned int numPts, Point *points, int width, int height);
 /* 'outline' data structure management */
 // static int  init_outline(Outline *outl);
@@ -59,20 +59,20 @@ static void draw_lines(Outline *outl, Raster buf);
 /* post-processing */
 static void post_process(Raster buf, uint8_t *image);
 /* glyph rendering */
-// static int  render_outline(Outline *outl, double transform[6], SFT_Image image);
+// static int  render_outline(Outline *outl, float transform[6], SFT_Image image);
 
 /* function implementations */
 
 /* TODO maybe we should use long here instead of int. */
 static inline int
-fast_floor(double x)
+fast_floor(float x)
 {
 	int i = (int) x;
 	return i - (i > x);
 }
 
 static inline int
-fast_ceil(double x)
+fast_ceil(float x)
 {
 	int i = (int) x;
 	return i + (i < x);
@@ -89,7 +89,7 @@ midpoint(Point a, Point b)
 
 /* Applies an affine linear transformation matrix to a set of points. */
 static void
-transform_points(unsigned int numPts, Point *points, double trf[6])
+transform_points(unsigned int numPts, Point *points, float trf[6])
 {
 	Point pt;
 	unsigned int i;
@@ -206,13 +206,13 @@ grow_lines(Outline *outl)
 static int
 is_flat(Outline *outl, Curve curve)
 {
-	const double maxArea2 = 2.0;
+	const float maxArea2 = 2.0;
 	Point a = outl->points[curve.beg];
 	Point b = outl->points[curve.ctrl];
 	Point c = outl->points[curve.end];
 	Point g = { b.x-a.x, b.y-a.y };
 	Point h = { c.x-a.x, c.y-a.y };
-	double area2 = fabs(g.x*h.y-h.x*g.y);
+	float area2 = fabs(g.x*h.y-h.x*g.y);
 	return area2 <= maxArea2;
 }
 
@@ -278,9 +278,9 @@ draw_line(Raster buf, Point origin, Point goal)
 	Point delta;
 	Point nextCrossing;
 	Point crossingIncr;
-	double halfDeltaX;
-	double prevDistance = 0.0, nextDistance;
-	double xAverage, yDifference;
+	float halfDeltaX;
+	float prevDistance = 0.0, nextDistance;
+	float xAverage, yDifference;
 	struct { int x, y; } pixel;
 	struct { int x, y; } dir;
 	int step, numSteps = 0;
@@ -334,7 +334,7 @@ draw_line(Raster buf, Point origin, Point goal)
 		cptr = &buf.cells[pixel.y * buf.width + pixel.x];
 		cell = *cptr;
 		cell.cover += yDifference;
-		xAverage -= (double) pixel.x;
+		xAverage -= (float) pixel.x;
 		cell.area += (1.0 - xAverage) * yDifference;
 		*cptr = cell;
 		prevDistance = nextDistance;
@@ -351,7 +351,7 @@ draw_line(Raster buf, Point origin, Point goal)
 	cptr = &buf.cells[pixel.y * buf.width + pixel.x];
 	cell = *cptr;
 	cell.cover += yDifference;
-	xAverage -= (double) pixel.x;
+	xAverage -= (float) pixel.x;
 	cell.area += (1.0 - xAverage) * yDifference;
 	*cptr = cell;
 }
@@ -373,7 +373,7 @@ static void
 post_process(Raster buf, uint8_t *image)
 {
 	Cell cell;
-	double accum = 0.0, value;
+	float accum = 0.0, value;
 	unsigned int i, num;
 	num = (unsigned int) buf.width * (unsigned int) buf.height;
 	for (i = 0; i < num; ++i) {
@@ -387,7 +387,7 @@ post_process(Raster buf, uint8_t *image)
 }
 
 int
-add_point(Outline *outl, double x, double y)
+add_point(Outline *outl, float x, float y)
 {
 	if (outl->numPoints >= outl->capPoints && grow_points(outl) < 0) {
 		return -1;
@@ -420,7 +420,7 @@ add_line(Outline *outl, uint_least16_t beg, uint_least16_t end)
 }
 
 int
-render_outline(Outline *outl, double transform[6], SFT_Image image)
+render_outline(Outline *outl, float transform[6], SFT_Image image)
 {
 	Cell *cells = NULL;
 	Raster buf;

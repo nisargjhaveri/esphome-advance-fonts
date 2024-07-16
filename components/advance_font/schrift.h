@@ -38,7 +38,7 @@ struct SFT_Image
 	int   height;
 };
 
-struct Point { double x, y; };
+struct Point { float x, y; };
 struct Line  { uint_least16_t beg, end; };
 struct Curve { uint_least16_t beg, end, ctrl; };
 
@@ -58,11 +58,11 @@ struct Outline
 int  init_outline(Outline *outl);
 void free_outline(Outline *outl);
 
-int add_point(Outline *outl, double x, double y);
+int add_point(Outline *outl, float x, float y);
 int add_curve(Outline *outl, uint_least16_t beg, uint_least16_t ctrl, uint_least16_t end);
 int add_line(Outline *outl, uint_least16_t beg, uint_least16_t end);
 
-int render_outline(Outline *outl, double transform[6], SFT_Image image);
+int render_outline(Outline *outl, float transform[6], SFT_Image image);
 
 #ifdef __cplusplus
 }
