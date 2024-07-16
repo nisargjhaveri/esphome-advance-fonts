@@ -84,6 +84,11 @@ hb_draw_funcs_t* create_draw_funcs() {
 }
 
 int draw_glyph(hb_font_t* font, hb_codepoint_t glyph, hb_glyph_extents_t extents, uint8_t* pixels) {
+    if (extents.width == 0 || extents.height == 0) {
+        // Nothing to be done
+        return 0;
+    }
+
     hb_draw_funcs_t *funcs = create_draw_funcs();
 
     Outline outline;
