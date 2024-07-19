@@ -4,7 +4,7 @@
 #include "esphome/core/color.h"
 #include "esphome/components/display/display_buffer.h"
 
-#include <hb.h>
+#include <tiny_text_renderer.h>
 
 namespace esphome {
 namespace advance_font {
@@ -20,8 +20,6 @@ public:
   void measure(const char *text, int *width, int *x_offset, int *baseline, int *height) override;
 
 private:
-  void measure_internal(hb_font_t *font, unsigned int glyph_count, hb_glyph_info_t *glyph_info, hb_glyph_position_t *glyph_pos, int *width, int *baseline, int *height);
-
   const unsigned char* font_data_;
   const unsigned long font_data_size_;
   const unsigned int height_;

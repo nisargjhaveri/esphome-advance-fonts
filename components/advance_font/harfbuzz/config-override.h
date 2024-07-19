@@ -1,1 +1,0 @@
-#undef HB_NO_DRAW

@@ -1,5 +1,3 @@
-import os
-
 import esphome.codegen as cg
 import esphome.config_validation as cv
 
@@ -11,7 +9,6 @@ from esphome.const import (
     CONF_RAW_DATA_ID,
     CONF_SIZE,
 )
-from esphome.helpers import copy_file_if_changed
 
 DOMAIN = "font"
 DEPENDENCIES = ["display"]
@@ -29,8 +26,7 @@ CONFIG_SCHEMA = cv.All({
 });
 
 async def to_code(config):
-    # Setup harfbuzz build
-    setup_harfbuzz_build()
+    cg.add_library("tiny-text-renderer", None, "https://github.com/nisargjhaveri/tiny-text-renderer#v0.0.1")
 
     # Read the font file and create a static array
     filename = CORE.relative_config_path(config[CONF_FILE])
@@ -47,26 +43,3 @@ async def to_code(config):
         len(file_content),
         config[CONF_SIZE],
     )
-
-def copy_harfbuzz_files() -> bool:
-    dir = os.path.dirname(__file__)
-
-    copy_file_if_changed(
-        os.path.join(dir, "harfbuzz_build.py"),
-        CORE.relative_build_path("harfbuzz_build.py"),
-    )
-
-    copy_file_if_changed(
-        os.path.join(dir, "harfbuzz", "config-override.h"),
-        CORE.relative_build_path("harfbuzz/config-override.h"),
-    )
-
-def setup_harfbuzz_build():
-    # Copy supporting files for harfbuzz build
-    copy_harfbuzz_files()
-
-    # Add harfbuzz as a library and setup build flags
-    cg.add_library("harfbuzz", None, "https://github.com/harfbuzz/harfbuzz.git#9.0.0")
-    cg.add_build_flag("-DHB_TINY")
-    cg.add_build_flag("-DHB_CONFIG_OVERRIDE_H=\"\\\"$PROJECT_DIR/harfbuzz/config-override.h\\\"\"")
-    cg.add_platformio_option("extra_scripts", ["pre:harfbuzz_build.py"])
