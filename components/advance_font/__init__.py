@@ -26,7 +26,7 @@ CONFIG_SCHEMA = cv.All({
 });
 
 async def to_code(config):
-    cg.add_library("tiny-text-renderer", None, "https://github.com/nisargjhaveri/tiny-text-renderer#v0.0.2")
+    cg.add_library("tiny-text-renderer", None, "https://github.com/nisargjhaveri/tiny-text-renderer#v0.0.3")
 
     # Read the font file and create a static array
     filename = CORE.relative_config_path(config[CONF_FILE])
